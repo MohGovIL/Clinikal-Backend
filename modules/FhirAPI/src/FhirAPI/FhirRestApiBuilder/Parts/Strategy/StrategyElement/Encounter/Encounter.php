@@ -18,6 +18,7 @@ use FhirAPI\FhirRestApiBuilder\Parts\Search\SearchContext;
 use FhirAPI\FhirRestApiBuilder\Parts\Strategy\Strategy;
 use FhirAPI\Model\QuestionnaireResponseTable;
 
+use GenericTools\Model\DocumentsTable;
 use GenericTools\Model\FormEncounterTable;
 use Interop\Container\ContainerInterface;
 

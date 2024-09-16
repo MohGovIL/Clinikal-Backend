@@ -10,7 +10,7 @@
   "repositories": [
     {
       "type": "vcs",
-      "url": "git@github.com:israeli-moh/composer-installers-clinikal-extender.git"
+      "url": "git@github.com:MohGovIL/Clinical-composer-installers.git"
     }
   ],
   "require": {

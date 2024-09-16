@@ -18,6 +18,7 @@ class GetTemplatesService
     public $reason_code;
     public $message_id;
     public $order;
+    public $active;
 
     //lists fields for join
     public $option_id;
@@ -37,6 +38,7 @@ class GetTemplatesService
         $this->option_id = (!empty($data['option_id'])) ? $data['option_id'] : null;
         $this->title = (!empty($data['title'])) ? $data['title'] : null;
         $this->seq = (!empty($data['seq'])) ? $data['seq'] : null;
+        $this->active = (!empty($data['active'])) ? $data['active'] : null;
     }
 }
 

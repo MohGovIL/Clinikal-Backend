@@ -157,6 +157,24 @@ class Module {
 
     }
 
+    /**
+     * load global variables foe every controllers
+     * @param ModuleManager $manager
+     */
+    public function init(ModuleManager $manager)
+    {
+        $events = $manager->getEventManager();
+        $sharedEvents = $events->getSharedManager();
 
+        $sharedEvents->attach(__NAMESPACE__, 'dispatch', function ($e) {
+            $controller = $e->getTarget();
+            //$controller->layout()->setVariable('status', null);
+            $controller->layout('clinikalApi/layout/layout');
+
+            //global variable of language direction
+            $controller->layout()->setVariable('language_direction', $_SESSION['language_direction']);
+
+        }, 100);
+    }
 
 }

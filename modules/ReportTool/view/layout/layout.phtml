@@ -1,15 +1,14 @@
 <?php
 use OpenEMR\Core\Header;
 /*require_once $GLOBALS['fileroot'].'/clinikal/ui-components/ValidateJS/ValidateJsFunctions.php';*/
-require_once $GLOBALS['fileroot'].'/vendor/clinikal/clinikal-backend/modules/GenericTools/src/GenericTools/Library/UiComponents/DataTableExtended/DataTableExtended.php';
-?>
+use GenericTools\Library\UiComponents\DataTableExtended\DataTableExtended;?>
 <!-- Layout -->
 <html>
 <head>
 
    <?php Header::setupHeader(['jquery','bootstrap','datetime-picker','main-theme', 'fontawesome', 'select2', 'sumoselect','moment','tooltipster']); ?>
     <script><?php require($GLOBALS['srcdir'] . '/formatting_DateToYYYYMMDD_js.js.php'); ?></script>
-    <?php  $table_handler= new DataTableExtended\DataTableExtended($table_id,$table_col_names);?>
+    <?php  $table_handler= new DataTableExtended($table_id,$table_col_names);?>
     <?php  $table_handler->LoadEssentialCssJs();?>
     <title><?php echo xlt($this->title) ?></title>
 

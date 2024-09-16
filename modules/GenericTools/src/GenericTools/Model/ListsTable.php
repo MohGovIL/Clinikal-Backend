@@ -191,7 +191,7 @@ class ListsTable
 
             $where = new Where();
             $where->equalTo('list_id', $listId);
-
+            $select->where($where);
             $order=$orderBy . " " . (!$typeOfOrder ? "ASC" : $typeOfOrder);
             $select->order($order);
 
@@ -272,4 +272,19 @@ class ListsTable
 
         return $results;
     }
+
+    public function insert(Lists $listObj)
+    {
+        return $this->tableGateway->insert((get_object_vars($listObj))) ? true : false;
+    }
+
+    public function update($set, $where)
+    {
+        return $this->tableGateway->update($set, $where) ? true : false;
+    }
+
+    public function delete($data) {
+        return $this->tableGateway->delete($data) ? true : false;
+    }
+
 }

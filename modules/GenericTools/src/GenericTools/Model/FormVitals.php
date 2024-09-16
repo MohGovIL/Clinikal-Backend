@@ -55,7 +55,7 @@ class FormVitals
         $this->head_circ = (!empty($data['head_circ'])) ? $data['head_circ'] : null;
         $this->oxygen_saturation = (!empty($data['oxygen_saturation'])) ? $data['oxygen_saturation'] : null;
         $this->glucose = (!empty($data['glucose'])) ? $data['glucose'] : null;
-        $this->pain_severity = (!empty($data['pain_severity'])) ? $data['pain_severity'] : null;
+        $this->pain_severity = (!is_null($data['pain_severity'])) ? $data['pain_severity'] : null;
         $this->eid = (!empty($data['eid'])) ? $data['eid'] : null;
         $this->category = (!empty($data['category'])) ? $data['category'] : null;
     }

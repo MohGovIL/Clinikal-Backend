@@ -69,7 +69,7 @@ class ListsOpenEmrTable
         }
         return $rsArray;
     }
-    public function getListWithTheType($type,$pid,$outcome)
+    public function getListWithTheType($type,$pid,$encounter,$outcome)
     {
         /*
 
@@ -94,10 +94,17 @@ class ListsOpenEmrTable
             ["ct_id","ct_key"],
             Select::JOIN_RIGHT
         );
+        $this->join = $this->appendJoin(
+            ["ie"=>"issue_encounter"],
+            new Expression("ie.pid=lists.pid AND ie.list_id=lists.id"),
+            ['encounter'=>'encounter','resolved'=>'resolved'],
+            Select::JOIN_LEFT
+        );
+
         //WAIT FOR SOSH $this->joinTables(); // add new join code
         $this->join = $this->getJoins();
 
-        $rs = $this->buildGenericSelect(['lists.type'=>$type,'lists.outcome'=>$outcome,"lists.pid"=>$pid]);
+        $rs = $this->buildGenericSelect(['lists.type'=>$type,'lists.outcome'=>$outcome,"lists.pid"=>$pid, "encounter"=>$encounter]);
 
         foreach ($rs as $r) {
             $rsArray[] = xl($r['code_text']);

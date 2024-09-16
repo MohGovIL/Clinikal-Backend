@@ -5,6 +5,7 @@
  * Date: 13/05/18
  * Time: 12:24
  */
+namespace GenericTools\Library\UiComponents\ValidateJS;
 
 class ValidateJsFunctions
 {

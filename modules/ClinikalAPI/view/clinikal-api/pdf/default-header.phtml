@@ -10,7 +10,7 @@ $clinicName
 <header style="font-family: Arial" dir="<?php echo text($langDir); ?>"  lang="<?php echo text($langCode); ?>">
     <table width="100%" style="width=100%;  /*border-bottom: 1px solid #000000;*/ vertical-align: bottom; font-family: Arial,serif; font-size: 9pt; color: black;">
         <tr>
-            <td   style="width=20%; text-align:right;">
+            <td  width="30%" align="<?php echo $langDir === 'ltr' ? 'left ': 'right' ?>">
                 <table>
                     <tr  lang="<?php echo text($langCode); ?>" style="font-family: Arial,serif; font-size: 9pt;">
                         <td  style="width=40%; text-align:right;"><?php echo xl("Clinic")." :";?></td>
@@ -34,19 +34,19 @@ $clinicName
                 </table>
             </td>
 
-            <td  style="width=60%;" >
-                <div style="width: 100%; height: 100%">
+            <td  width="40%"  align="center" >
+
                     <?php if(is_file($GLOBALS['OE_SITE_DIR'] . '/images/logo_1.png')): ?>
                         <?php if (isset($type) && $type === 'html'): ?>
                             <img style="padding-right:100px; src="<?php echo $GLOBALS['OE_SITE_WEBROOT'] . '/images/logo_1.png' ?>" width="126px" height="65px"/>
                         <?php else: ?>
-                            <img style="padding-right:100px; vertical-align:middle" src="var:logoHeader"  width="126px" height="65px " />
+                            <img  src="var:logoHeader"  width="126px" height="65px " />
                         <?php endif; ?>
                     <?php endif; ?>
-                </div>
+
             </td>
 
-            <td  style="width=20%; text-align:left;">
+            <td  width="30%" align=":<?php echo $langDir === 'ltr' ? 'right ': 'left' ?>;">
                     <div  style=" font-family: Arial,serif; font-size: 9pt;">
                         <span  style="width=40%; "><?php echo xl("Creation time")." :";?></span>
                         <span  style="width=40%; " dir="ltr"><?php echo $showDate; ?></span>

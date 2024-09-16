@@ -1,6 +1,6 @@
 <?php
 
-namespace DataTableExtended;
+namespace GenericTools\Library\UiComponents\DataTableExtended;
 
 class DataTableExtended
 {
@@ -31,7 +31,7 @@ class DataTableExtended
             exit();
         }
 
-        $table_html_string='<table id="'.$tableId.'" class="table">';
+        $table_html_string='<table style="width:100%" id="'.$tableId.'" class="table">';
         $table_html_string.='<thead>';
         //$table_html_string.='<tr>';
 
@@ -56,19 +56,20 @@ class DataTableExtended
 
     public function LoadEssentialCssJs()
     {
-        $uiComponentsPath='/vendor/clinikal/clinikal-backend/modules/GenericTools/src/GenericTools/Library/UiComponents';
+        //$uiComponentsPath='/vendor/clinikal/clinikal-backend/modules/GenericTools/src/GenericTools/Library/UiComponents';
+        $uiPath='/'.$GLOBALS['webroot'].$GLOBALS['baseModDir'].$GLOBALS['zendModDir'].'/public';
         $header_html='';
-        $header_html.='<link href="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/css/jquery.dataTables.min.css" media="screen" rel="stylesheet" type="text/css">';
-        $header_html.='<link href="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/css/dataTablesExtend.css" media="screen" rel="stylesheet" type="text/css">';
+        $header_html.='<link href="'.$uiPath.'/css/generictools/datatable/jquery.dataTables.min.css" media="screen" rel="stylesheet" type="text/css">';
+        $header_html.='<link href="'.$uiPath.'/css/generictools/datatable/dataTablesExtend.css" media="screen" rel="stylesheet" type="text/css">';
 
-        $header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/js/datatables.min.js"></script>';
+        $header_html.='<script type="text/javascript" src="'.$uiPath.'/js/generictools/datatable/datatables.min.js"></script>';
 
-        $header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/js/dataTables.bootstrap.min.js"></script>';
-        $header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/js/dataTables.buttons.min.js"></script>';
-        $header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/js/buttons.print.min.js"></script>';
-        $header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/js/buttons.html5.min.js"></script>';
+        $header_html.='<script type="text/javascript" src="'.$uiPath.'/js/generictools/datatable/dataTables.bootstrap.min.js"></script>';
+        $header_html.='<script type="text/javascript" src="'.$uiPath.'/js/generictools/datatable/dataTables.buttons.min.js"></script>';
+        $header_html.='<script type="text/javascript" src="'.$uiPath.'/js/generictools/datatable/buttons.print.min.js"></script>';
+        $header_html.='<script type="text/javascript" src="'.$uiPath.'/js/generictools/datatable/buttons.html5.min.js"></script>';
 
-        $header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].$uiComponentsPath.'/DataTableExtended/src/js/dataTablesExtend.js"></script>';
+        $header_html.='<script type="text/javascript" src="'.$uiPath.'/js/generictools/datatable/dataTablesExtend.js"></script>';
 
         //$header_html.='<script type="text/javascript" src="'.$GLOBALS['webroot'].'/interface/modules/zend_modules/public/js/bootstrap.min.js"></script>';
         echo $header_html;

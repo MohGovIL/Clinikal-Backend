@@ -6,6 +6,7 @@ use FhirAPI\FhirRestApiBuilder\Parts\ErrorCodes;
 use FhirAPI\FhirRestApiBuilder\Parts\Strategy\StrategyElement\ServiceRequest\FhirServiceRequestMapping;
 use FhirAPI\FhirRestApiBuilder\Parts\Strategy\StrategyElement\ServiceRequest\ServiceRequest;
 use FhirAPI\Model\FhirServiceRequestTable;
+use FhirAPI\Model\QuestionnaireResponseTable;
 use Formhandler\View\Helper\GenericTable;
 use GenericTools\Controller\BaseController as GenericBaseController;
 use GenericTools\Model\AclTables;
@@ -28,6 +29,8 @@ class PdfBaseController extends GenericBaseController
     const FOOTER_PATH = 'clinikal-api/pdf/default-footer';
     const DOC_TYPE = "file_url";
     const PDF_MINE_TYPE = "application/pdf";
+    const CITIES_LIST = 'mh_cities';
+    const STREETS_LIST = 'mh_streets';
 
     private $container;
     public $postData = array();
@@ -71,6 +74,7 @@ class PdfBaseController extends GenericBaseController
             $data['age'] = $info['age'];
             $data['phone'] = ($info['phone_cell'] ? $info['phone_cell']  : ($info['phone_home'] ? $info['phone_home'] : ($info['phone_contact'] ? $info['phone_contact'] :""))) ;
             $data['HMO'] = $info['insurance_organiz_name'];
+            $data['address'] = $this->patientAddress($info);
             return $data;
 
         } else {
@@ -78,15 +82,46 @@ class PdfBaseController extends GenericBaseController
         }
     }
 
-    public function getListsOpenEMRInfo($type=null,$pid,$outcome)
+    public function patientAddress($patientInfo)
+    {
+        $city = !empty($patientInfo['city']) ? xlt($this->container->get(ListsTable::class)->getSpecificTitle(self::CITIES_LIST, $patientInfo['city'])) : '';
+        $street = !empty($patientInfo['street']) ? xlt($this->container->get(ListsTable::class)->getSpecificTitle(self::STREETS_LIST, $patientInfo['street'])) : '';
+        $numberHouse = !empty($patientInfo['mh_house_no']) ? $patientInfo['mh_house_no'] : '';
+        $pobox = !empty($patientInfo['mh_pobox']) ? $patientInfo['mh_pobox'] : '';
+
+        $address = '';
+        if ($street !== '') {
+          $address .= $street . ' ' . $numberHouse . ', ';
+        }
+        if ($pobox !== '') {
+            $address .= xlt('PO Box') . ' ' . $pobox .', ';
+        }
+        $address .= $city;
+
+        return $address;
+    }
+
+    public function getListsOpenEMRInfo($type=null,$pid,$encounter,$outcome)
     {
         if (!is_null($type)) {
-            $info = $this->container->get('GenericTools\Model\ListsOpenEmrTable')->getListWithTheType($type,$pid,$outcome);
-            return $info;
+            $info = $this->container->get('GenericTools\Model\ListsOpenEmrTable')->getListWithTheType($type,$pid,$encounter,$outcome);
+            $result = [];
+            foreach ($info as $item) {
+                if(!in_array($item, $result)) {
+                    $result[] = $item;
+                }
+            }
+            return $result;
 
         } else {
             return array();
         }
+    }
+
+    public function getEncounterStartDate($encId)
+    {
+        $info = $this->container->get(FormEncounterTable::class)->fetchById($encId);
+        return $info['date'];
     }
 
     public function getUserInfo($id = null)
@@ -188,8 +223,11 @@ class PdfBaseController extends GenericBaseController
         {
             foreach($bodyPath as $key=>$path) {
                 $bodyData=$bodyDataTemp[$key];
+                if ($key > 0) {
+                    $this->getPdfService()->pagebreak();
+                }
                 $this->getPdfService()->bodyBuilder($path, $bodyData);
-                $this->getPdfService()->pagebreak();
+
             }
         }
         else {
@@ -247,13 +285,13 @@ class PdfBaseController extends GenericBaseController
     }
 
     public function getSensitivities(){
-        return $this->getListsOpenEMRInfo("sensitive",$this->postData['patient'],1);
+        return $this->getListsOpenEMRInfo("sensitive",$this->postData['patient'],$this->postData['encounter'],1);
     }
     public function getMedicalProblems(){
-        return $this->getListsOpenEMRInfo("medical_problem",$this->postData['patient'],1);
+        return $this->getListsOpenEMRInfo("medical_problem",$this->postData['patient'],$this->postData['encounter'],1);
     }
     public function getMedicine(){
-        return $this->getListsOpenEMRInfo("medication",$this->postData['patient'],1);
+        return $this->getListsOpenEMRInfo("medication",$this->postData['patient'],$this->postData['encounter'],1);
     }
     public function createTableJsonFromVitals($vitals){
         $arrTemp = [];
@@ -270,15 +308,20 @@ class PdfBaseController extends GenericBaseController
 
         return $arrTemp;
     }
-    public function getConstantVitals($pid,$category,$acitivity,$order)
+    public function getConstantVitals($encounter,$pid,$category,$acitivity,$order)
     {
-        $vitals = $this->getVitals($pid,$category,$acitivity,$order);
+        $vitals = $this->getVitals($encounter,$pid,$category,$acitivity,$order);
         foreach($vitals as $k=>$v)
         {
             if($k === 0) {
                 foreach ($v as $key => $value) {
                     if ($key !== 'height' && $key !== 'weight') {
                         unset($vitals[$k][$key]);
+                    } else {
+                        $vitals[$k][$key][2] = (is_null($value[2]) || $value[2] == "" || $value[2] == 0 && $value[2] == "0.00") ?"-":$value[2];
+                        if ($vitals[$k][$key][2] !== '-') {
+                            $vitals[$k][$key][2] = $key === 'weight' ? number_format($value[2],1) : number_format($value[2]);
+                        }
                     }
                 }
             }
@@ -288,20 +331,20 @@ class PdfBaseController extends GenericBaseController
         }
         return sizeof($vitals[0]) > 1 ? $this->createTableJsonFromVitals($vitals) : null;
     }
-    public function getVariantVitals($pid,$category,$acitivity,$order)
+    public function getVariantVitals($encounter,$pid,$category,$acitivity,$order)
     {
-        $vitals = $this->getVitals($pid,$category,$acitivity,$order);
+        $vitals = $this->getVitals($encounter,$pid,$category,$acitivity,$order);
 
 
 
         foreach($vitals as $key=>$value){
             foreach($value['bpd'] as $k=>$v) {
-                if($k==0)
+                if($k!==2)
                 {
                     $vitals[$key]['pressure'][$k] = $vitals[$key]['bpd'][$k];
                 }
                 else {
-                    $vitals[$key]['pressure'][$k] = $vitals[$key]['bpd'][$k] . "/" . $vitals[$key]['bps'][$k];
+                    $vitals[$key]['pressure'][$k] = !is_null($vitals[$key]['bps'][$k] ) ? $vitals[$key]['bps'][$k] . "/" . $vitals[$key]['bpd'][$k] : '-';
                 }
             }
 
@@ -315,6 +358,17 @@ class PdfBaseController extends GenericBaseController
                     case 'waist_circ':
                     case 'head_circ':
                         unset($vitals[$key][$k]);
+                        break;
+                    case 'temperature':
+                        $vitals[$key][$k][2] = $vitals[$key][$k][2] !== '0.00' && $vitals[$key][$k][2] > 0 ? number_format($vitals[$key][$k][2],1) : '-';
+                        break;
+                    case 'pulse':
+                    case 'respiration':
+                    case 'oxygen_saturation':
+                        $vitals[$key][$k][2] = $vitals[$key][$k][2] !== '0.00' && $vitals[$key][$k][2] > 0 ? number_format($vitals[$key][$k][2],0) : '-';
+                        break;
+                    case 'pain_severity':
+                        $vitals[$key][$k][2] = is_null($v[2]) ? "-":$v[2];
                         break;
                     case 'date':
                         $time = explode(":",$vitals[$key][$k][1]);
@@ -335,7 +389,7 @@ class PdfBaseController extends GenericBaseController
 
         return $this->createTableJsonFromVitals($vitals);
     }
-    public function getVitals($pid,$category,$acitivity,$order){
+    public function getVitals($encounter,$pid,$category,$acitivity,$order){
         $observationList =  $this->container->get('GenericTools\Model\ListsTable')->getList("loinc_org");
         $observationTitleList = [];
         foreach($observationList as $key=>$value)
@@ -343,7 +397,7 @@ class PdfBaseController extends GenericBaseController
             $notes = json_decode($value['notes']);
             $observationTitleList[$value['mapping']] = [xl($notes->label),xl($value['subtype'])];
         }
-        $observations = $this->container->get('GenericTools\Model\FormVitalsTable')->getVitals($pid,$category,$acitivity,$order);
+        $observations = $this->container->get('GenericTools\Model\FormVitalsTable')->getVitals($encounter,$pid,$category,$acitivity,$order);
         $observedArr = [];
 
         foreach($observations as $keyParent=>$valuesParent)
@@ -354,7 +408,7 @@ class PdfBaseController extends GenericBaseController
                     $observedArr[$keyParent][$key] = array_merge($observationTitleList[$key], [$value]);
                 }
                 if($key==="date"){
-                    $observedArr[$keyParent][$key]=[xlt("Hour"), explode(" ",$value)[1]];
+                    $observedArr[$keyParent][$key]=[xlt("Hour"), oeFormatDateTime($value)];
                 }
             }
 
@@ -404,6 +458,12 @@ class PdfBaseController extends GenericBaseController
         $listsTable= $this->container->get(ListsTable::class);
         $list = $listsTable->getListForViewFormNoTranslation("drug_form");
         return $list;
+    }
+
+    public function getQuestionareUpdatedUser($encounter, $questionaireName)
+    {
+        $result = $this->container->get(QuestionnaireResponseTable::class)->buildGenericSelect(['encounter' => $encounter, 'form_name' => $questionaireName]);
+        return !empty($result) ? $result[0]['update_by'] : null;
     }
 
 }

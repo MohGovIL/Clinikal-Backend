@@ -33,6 +33,7 @@ class FhirValueSetMapping extends FhirBaseMapping  implements MappingData
         $FHIRValueSet->getId()->setValue($data[0]['vs_id']);
         $FHIRValueSet->getTitle()->setValue($data[0]['vs_title']);
         $FHIRValueSet->getStatus()->setValue($data[0]['vs_status']);
+        $FHIRValueSet->getLanguage()->setValue($data[0]['vs_lang']);
 
         $operations = $params[1];
 
@@ -79,6 +80,9 @@ class FhirValueSetMapping extends FhirBaseMapping  implements MappingData
 
         $FHIRString= $this->createFHIRString(null);
         $FHIRValueSet->setTitle($FHIRString);
+
+        $FHIRCode = $this->createFHIRCode(null);
+        $FHIRValueSet->setLanguage($FHIRCode);
 
         $FHIRPublicationStatus=$this->createFHIRPublicationStatus(null);
         $FHIRValueSet->setStatus($FHIRPublicationStatus);

@@ -1,0 +1,283 @@
+<?php
+
+use GenericTools\Library\UiComponents\DataTableExtended\DataTableExtended;
+use GenericTools\Library\UiComponents\Header\ClinikalHeaders;
+
+$table_id='templates_table';
+$table_col_names=array(
+    '0'=>Xl('Form'),
+    '1'=>Xl('field'),
+    '2'=>Xl('Service type'),
+    '3'=>Xl('Reason code'),
+    '4'=>Xl('Template'),
+    '5'=>Xl('Active'),
+    '6' => ''
+);
+$table_handler= new DataTableExtended($table_id,$table_col_names);
+$headers = new ClinikalHeaders();
+
+?>
+
+
+<?php $table_handler->LoadEssentialCssJs(); ?>
+<div id="patient-vaccines" class="container">
+
+    <?php echo $headers->titleWithButtons('Templates management', array(
+        array('id' => 'assign_template', 'title' => 'Assign template' ),
+        array('id' => 'add_template', 'title' => 'Add/edit template' ),
+        )); ?>
+
+    <div id="filters-container">
+        <div class="row">
+
+            <div class="col-xs-12 col-md-3">
+                <label for="form_name" class="control-label"><?php echo xlt("Form name").":"; ?></label>
+                <select class="selectpicker form-control" id="form_name" data-show-subtext="true" data-live-search="true">
+                    <option data-tokens="" value=""><?php echo xlt("All"); ?></option>
+                    <?php foreach ($forms as $formId => $formName): ?>
+                        <option data-tokens="" value="<?php echo attr($formId)?>"><?php echo xlt($formName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <label for="field_name" class="control-label"><?php echo xlt("Field name").":"; ?></label>
+                <select class="selectpicker form-control" id="field_name" data-show-subtext="true" data-live-search="true" disabled="true">
+                    <option data-tokens="" value="" selected><?php echo xlt("All"); ?></option>
+                </select>
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <label for="service_type" class="control-label"><?php echo xlt("Service type").":"; ?></label>
+                <select class="selectpicker form-control" id="service_type" data-show-subtext="true" data-live-search="true">
+                    <option data-tokens="" value=""><?php echo xlt("All"); ?></option>
+                    <?php foreach ($serviceTypes as $serviceTypeId => $serviceTypeName): ?>
+                        <option data-tokens="" value="<?php echo attr($serviceTypeId)?>"><?php echo xlt($serviceTypeName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <label for="reason_code" class="control-label"><?php echo xlt("Reason code").":"; ?></label>
+                <select class="selectpicker form-control" id="reason_code" data-show-subtext="true" data-live-search="true" disabled="true">
+                    <option data-tokens="" value="" selected><?php echo xlt("All"); ?></option>
+                </select>
+            </div>
+
+            <div class="col-xs-12 col-md-6">
+                <label for="templates" class="control-label"><?php echo xlt("Template").":"; ?></label>
+                <select class="selectpicker form-control" id="templates" data-show-subtext="true" data-live-search="true">
+                    <option data-tokens="" value=""><?php echo xlt("All"); ?></option>
+                    <?php foreach ($templates as $templateId => $templateName): ?>
+                        <option data-tokens="" value="<?php echo attr($templateId)?>"><?php echo xlt($templateName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="col-xs-12 col-md-2">
+                <label for="active" class="control-label"><?php echo xlt("Active").":"; ?></label>
+                <select class="selectpicker form-control select2lookalike" id="active" data-show-subtext="true" data-live-search="true">
+                    <option data-tokens="" value=""><?php echo xlt("All"); ?></option>
+                    <option data-tokens="1" value="1" selected><?php echo xlt("Yes"); ?></option>
+                    <option data-tokens="0" value="0"><?php echo xlt("No"); ?></option>
+                </select>
+
+            </div>
+
+            <div class="col-xs-12 col-md-2 pull-left">
+                <br>
+                <button type="button" id ="filter" class="btn btn-info"><?php echo xlt("Filter"); ?></button>
+                <button type="button" id ="clear_filters" class="btn btn-info pull-left" ><?php echo xlt("Clear Filters"); ?></button>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-container">
+                <div class="content">
+                    <?php $table_handler->echoBaseHTML(); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function renderOptions(mySelect,myOptions){
+
+
+        var selected=mySelect.find(":selected").val();
+
+        mySelect.empty();
+        mySelect.append(
+            $('<option></option>').val("").html("<?php echo xlt('ALL')?>")
+        );
+
+        $.each(myOptions, function(val, text) {
+            mySelect.append(
+                $('<option></option>').val(val).html(text)
+            );
+        });
+
+    }
+
+    function loadList(action, filter, selectElement)
+    {
+        var url= '<?php echo $this->basePath()?>/templates-management';
+        $.ajax({
+            url: url+"/"+action + '?filter='+filter,
+            error: function() {
+                console.log("row failed to load");
+            },
+            dataType: 'json',
+            success: function(data) {
+                console.log(data)
+
+                renderOptions(selectElement,data);
+                selectElement.prop('disabled', false);
+
+
+            },
+            type: 'GET'
+        });
+    }
+
+
+
+    function clearFilters() {
+
+        var form_name=$('#form_name').val('').trigger('change');
+        var field_name= $('#field_name').val('').trigger('change').prop('disabled', true);
+        var service_type=$('#service_type').val('').trigger('change');
+        var reason_code=$('#reason_code').val('').trigger('change').prop('disabled', true)
+        var template=$('#templates').val('').trigger('change');
+        var active= $('#active').val(1).trigger('change');
+    }
+
+    function getFilteredData(){
+        var form_name=$('#form_name').val();
+        var field_name= $('#field_name').val();
+        var service_type=$('#service_type').val();
+        var reason_code=$('#reason_code').val();
+        var template=$('#templates').val();
+        var active= $('#active').val();
+
+
+
+        var data =  {
+            "form_name": form_name,
+            "field_name": field_name,
+            "service_type": service_type,
+            "reason_code": reason_code,
+            "template": template,
+            "active": active,
+        }
+
+        return data;
+    }
+
+    function goToAssignTemplate(e, queryParametersObj) {
+        //console.log(document.URL);
+        var url= "<?php echo $this->basePath() ?>"+"/templates-management/assign-template";
+        if (typeof queryParametersObj !== 'undefined') {
+            url += '?edit=1&' + queryStringParameters(queryParametersObj)
+        }
+        top.restoreSession();
+        window.location=url;
+    }
+
+    function goToAddTemplate()
+    {
+        var url= "<?php echo $this->basePath() ?>"+"/templates-management/add-edit-template";
+        top.restoreSession();
+        window.location=url;
+    }
+
+    function queryStringParameters(obj) {
+        var str = [];
+        for (var p in obj)
+            if (obj.hasOwnProperty(p)) {
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+            }
+        return str.join("&");
+    }
+
+    function gotoEdit(form, field, serviceType, reasonCode, template) {
+
+        var recordDtails = {
+            form_id: form,
+            field_id: field,
+            service_type:serviceType,
+            reason_code: reasonCode,
+            template: template
+        }
+        return goToAssignTemplate(null, recordDtails);
+    }
+
+    $( document ).ready(function() {
+
+        $('#reason_codes, #templates').select2({
+            <?php require($GLOBALS['srcdir'] . '/js/xl/select2.js.php'); ?>
+        });
+
+        $("#tab_title").html(<?php echo js_escape($title) ?>);
+
+       /* DATATABLE */
+        <?php $table_handler->setUiSettings(false, false);?>
+       <?php $table_handler->initDataTable($table_id, $data,null,false );?>
+       <?php require($GLOBALS['srcdir'] . '/js/xl/datatables-net.js.php'); ?>
+       <?php $table_handler->closeDataTable() ?>
+
+
+        function filterData() {
+
+            var data = getFilteredData();
+            loadFilteredData(custom_table, data,'<?php echo $this->basePath()?>/templates-management/templates-management-ajax');
+        }
+
+        function loadFields()
+        {
+            var selectedForm = $('#form_name').val();
+            if(selectedForm.length > 0) {
+                loadList('loadFileds', selectedForm, $('#field_name'))
+            } else {
+                $('#field_name').empty();
+                $('#field_name').append(
+                    $('<option></option>').val("").html("<?php echo xlt('ALL')?>")
+                );
+                $('#field_name').prop('disabled', true);
+            }
+        }
+
+        function loadReasonCodes()
+        {
+            var selectedServiceType = $('#service_type').val();
+            if(selectedServiceType.length > 0) {
+                loadList('loadReasonCodes', selectedServiceType, $('#reason_code'))
+            } else {
+                $('#reason_code').empty();
+                $('#reason_code').append(
+                    $('<option></option>').val("").html("<?php echo xlt('ALL')?>")
+                );
+                $('#reason_code').prop('disabled', true);
+            }
+        }
+
+        $("#clear_filters").on( "click",clearFilters);
+        $("#filter").on( "click",filterData);
+        $("#form_name").on( "change",loadFields);
+        $("#service_type").on( "change",loadReasonCodes);
+        $("#assign_template").on( "click",goToAssignTemplate);
+        $("#add_template").on( "click",goToAddTemplate);
+
+    });
+</script>
+
+

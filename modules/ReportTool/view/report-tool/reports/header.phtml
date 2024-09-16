@@ -1,5 +1,6 @@
 <?php
-require_once $GLOBALS['fileroot'].'/vendor/clinikal/clinikal-backend/modules/GenericTools/src/GenericTools/Library/UiComponents/Header/ClinikalHeaders.php';
+
+use GenericTools\Library\UiComponents\Header\ClinikalHeaders;
 $headers = new ClinikalHeaders();
 echo $headers->titleWithButtons($title);
 ?>

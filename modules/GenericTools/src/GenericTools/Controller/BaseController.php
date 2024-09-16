@@ -1068,4 +1068,11 @@ class BaseController extends AbstractActionController
         $where=array ('filter' => array (0 => array ('value' => $value, 'operator' => '=',),),);
         return $valueSetsTable->getValueSetById($valueSet,$where);
     }
+
+    protected function getConnectedUserId()
+    {
+        return $_SESSION['authUserID'];
+    }
+
+
 }

@@ -1254,7 +1254,7 @@ class FhirBaseMapping
     {
         $FHIRDecimal = new FHIRDecimal;
 
-        if (empty($value)) {
+        if (!is_numeric($value)) {
             return $FHIRDecimal;
         }
 

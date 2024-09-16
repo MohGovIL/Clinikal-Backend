@@ -1,0 +1,456 @@
+<?php
+
+use ClinikalAPI\Model\GetTemplatesServiceTable;
+use GenericTools\Library\UiComponents\Header\ClinikalHeaders;
+$headers = new ClinikalHeaders();
+$menuBottons[] = array('id' => 'save', 'title' => 'Save');
+if ($is_edit) {
+    $menuBottons[] = array('id' => 'delete', 'title' => 'Delete assigned');
+}
+$menuBottons[] = array('id' => 'go_back', 'title' => 'cancel');
+?>
+<style>
+
+    #row_1 #commercial_name{
+        font-size: 12px;
+    }
+    #alredy-exists{
+        display: none;
+    }
+    #general-error{
+        display: none;
+    }
+
+</style>
+<div id="add-edit-batch" class="container">
+
+    <?php echo $headers->titleWithButtons($is_edit? "Update assigned" : "Assign template" , $menuBottons);  ?>
+
+    <div id="template-form-container" class="">
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <?php if($showSuccessMsg): ?>
+                <div id="success-msg" class="alert alert-success" role="alert">
+                    <?php echo xlt('The action completed successfully')?>
+                </div>
+                <?php endif; ?>
+                <div id="alredy-exists" class="alert alert-danger" role="alert">
+                    <?php echo xlt('This assigned already exists')?>
+                </div>
+                <div id="general-error" class="alert alert-danger" role="alert">
+                    <?php echo xlt('Error ouccored')?>
+                </div>
+            </div>
+        </div>
+        <form>
+        <div id="row_1" class="row row_padded">
+
+            <div class="col-xs-12 col-md-3">
+                <label for="form_name" class="control-label"><?php echo xlt("Form name").":"; ?></label>
+                <select class="selectpicker form-control" id="form_name" data-show-subtext="true" data-live-search="true">
+                    <?php if(!$is_edit): ?>
+                        <option data-tokens="" value=""><?php echo xlt("Choose"); ?></option>
+                    <?php endif; ?>
+                    <?php foreach ($forms as $formId => $formName): ?>
+                        <option data-tokens="" value="<?php echo attr($formId)?>" <?php if ($formId === $record['form_id']) echo 'selected';?>><?php echo xlt($formName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span id="form_name_error" class="error-message" style="display: none"> <?php echo xlt("Value is required"); ?> </span>
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <label for="field_name" class="control-label"><?php echo xlt("Field name").":"; ?></label>
+                <select class="selectpicker form-control" id="field_name" data-show-subtext="true" data-live-search="true" <?php if (!$is_edit) echo 'disabled';?>>
+                    <?php if($is_edit): ?>
+                        <?php foreach ($formFiles as $fieldId => $fieldName): ?>
+                            <option data-tokens="" value="<?php echo attr($fieldId)?>" <?php if ($fieldId === $record['form_field']) echo 'selected';?>><?php echo xlt($fieldName); ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+                <span id="field_name_error" class="error-message" style="display: none"> <?php echo xlt("Value is required"); ?> </span>
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <label for="service_type" class="control-label"><?php echo xlt("Service type").":"; ?></label>
+                <select class="selectpicker form-control" id="service_type" data-show-subtext="true" data-live-search="true">
+                    <?php if(!$is_edit): ?>
+                        <option data-tokens="" value=""><?php echo xlt("Choose"); ?></option>
+                    <?php endif; ?>
+                    <?php foreach ($serviceTypes as $serviceTypeId => $serviceTypeName): ?>
+                        <option data-tokens="" value="<?php echo attr($serviceTypeId)?>" <?php if ($serviceTypeId === $record['service_type']) echo 'selected';?>><?php echo xlt($serviceTypeName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span id="service_type_error" class="error-message" style="display: none"> <?php echo xlt("Value is required"); ?> </span>
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <label for="reason_code" class="control-label"><?php echo xlt("Reason code").":"; ?></label>
+                <select class="selectpicker form-control" id="reason_code" data-show-subtext="true" data-live-search="true" <?php if (!$is_edit) echo 'disabled';?>>
+                    <?php if($is_edit): ?>
+                        <option value="<?php echo attr(GetTemplatesServiceTable::ALL_REASON_CODE) ?>" <?php if ($record['reason_code'] == GetTemplatesServiceTable::ALL_REASON_CODE) echo 'selected';?>><?php echo xlt(GetTemplatesServiceTable::ALL_REASON_CODE_STRING); ?></option>
+                        <?php foreach ($reasonCode as $reasonCodeId => $reasonCodeName): ?>
+                            <option value="<?php echo attr($reasonCodeId)?>" <?php if ($reasonCodeId == $record['reason_code']) echo 'selected';?>><?php echo xlt($reasonCodeName); ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+                <span id="reason_code_error" class="error-message" style="display: none"> <?php echo xlt("Value is required"); ?> </span>
+            </div>
+        </div>
+        <div id="row_2" class="row row_padded">
+            <div class="col-xs-12 col-md-6">
+                <label for="templates" class="control-label"><?php echo xlt("Template").":"; ?></label>
+                <select class="selectpicker form-control" id="templates" data-show-subtext="true" data-live-search="true">
+                    <?php if(!$is_edit): ?>
+                        <option data-tokens="" value=""><?php echo xlt("Choose"); ?></option>
+                    <?php endif; ?>
+                    <?php foreach ($templates as $templateId => $templateName): ?>
+                        <option data-tokens="" value="<?php echo attr($templateId)?>" <?php if ($templateId == $record['message_id']) echo 'selected';?>><?php echo xlt($templateName); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span id="templates_error" class="error-message" style="display: none"> <?php echo xlt("Value is required"); ?> </span>
+            </div>
+
+            <div class="col-xs-12 col-md-2">
+                <label for="seq" class="control-label"><?php echo xlt("Level of usability").":"; ?></label>
+                <select class="selectpicker form-control select2lookalike" id="seq" data-show-subtext="true" data-live-search="true">
+                    <?php for ($number = 1; $number <=10; $number++): ?>
+                        <option data-tokens="<?php echo $number?>" value="<?php echo $number?>" <?php if ($number == $record['seq'] || (!$is_edit && $number === 5)) echo 'selected';?>><?php echo $number?></option>
+                    <?php endfor; ?>
+                </select>
+
+            </div>
+
+            <div class="col-xs-12 col-md-3">
+                <div class="col-xs-2 col-md-5">
+                    <label for="active" class="control-label"><?php echo xlt("Active").":"; ?></label>
+                </div>
+                <div id="active" class="col-xs-2 col-md-7">
+                    <label class="radio-inline fix_inline_radio"><input type="radio" value="1" name="optradio" <?php echo (!$is_edit||isset($record['active'])&&$record['active']=="1")? "checked" : ""; ?>><?php echo xlt("Yes"); ?></label>
+                    <label class="radio-inline fix_inline_radio"><input type="radio" value="0"name="optradio" <?php echo ($is_edit && empty($record['active']))? "checked" : ""; ?>><?php echo xlt("No"); ?></label>
+                </div>
+
+            </div>
+            </div>
+        </div>
+        <div id="row_3" class="row row_padded">
+            <div class="col-xs-12 col-md-4">
+                <div class="row">
+                    <div class="col-xs-2 col-md-4">
+                        <label><?php echo xlt("Updated by").":"; ?></label>
+                    </div>
+                    <div class="col-xs-10 col-md-8">
+                        <label id="updated_by"><?php echo (isset($user)) ?   text($user) : '';?></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <div class="row">
+                    <div class="col-xs-2 col-md-3">
+                        <label><?php echo xlt("Update date").":"; ?></label>
+                    </div>
+                    <div class="col-xs-10 col-md-4">
+                        <label id="update_date"><?php echo text(oeFormatShortDate(date("Y-m-d"))); ?></label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+
+    var is_edit=<?php echo js_escape($is_edit) ?>;
+
+    <?php if ($is_edit): ?>
+    var old_data={
+        "form_id":<?php echo js_escape($record['form_id']) ?>,
+        "form_field":<?php echo js_escape($record['form_field']) ?>,
+        "service_type":<?php echo js_escape($record['service_type']) ?>,
+        "reason_code":<?php echo js_escape($record['reason_code']) ?>,
+        "message_id":<?php echo js_escape($record['message_id']) ?>
+    };
+    <?php else: ?>
+    var old_data=null;
+    <?php endif; ?>
+
+    $('#reason_code, #templates').select2({
+        <?php require($GLOBALS['srcdir'] . '/js/xl/select2.js.php'); ?>
+    });
+
+    function goBack(e) {
+        e.preventDefault();
+        var url=  '<?php echo $this->basePath()?>'+'/templates-management';
+        top.restoreSession();
+        window.location=url;
+    }
+
+
+    function loadList(action, filter, selectElement)
+    {
+        var url= '<?php echo $this->basePath()?>/templates-management';
+        $.ajax({
+            url: url+"/"+action + '?filter='+filter,
+            error: function() {
+                console.log("row failed to load");
+            },
+            dataType: 'json',
+            success: function(data) {
+                console.log(data)
+
+                renderOptions(selectElement,data);
+                selectElement.prop('disabled', false);
+
+            },
+            type: 'GET'
+        });
+    }
+
+    function loadFields()
+    {
+        var selectedForm = $('#form_name').val();
+        if(selectedForm.length > 0) {
+            loadList('loadFileds', selectedForm, $('#field_name'))
+        } else {
+            $('#field_name').empty();
+            $('#field_name').append(
+                $('<option></option>').val("").html("<?php echo xlt('ALL')?>")
+            );
+            $('#field_name').prop('disabled', true);
+        }
+    }
+
+    function loadReasonCodes()
+    {
+        var selectedServiceType = $('#service_type').val();
+        if(selectedServiceType.length > 0) {
+            loadList('loadReasonCodes', selectedServiceType, $('#reason_code'))
+        } else {
+            $('#reason_code').empty();
+            $('#reason_code').append(
+                $('<option></option>').val("").html("<?php echo xlt('ALL')?>")
+            );
+            $('#reason_code').prop('disabled', true);
+        }
+    }
+
+
+    $("#form_name").on( "change",loadFields);
+    $("#service_type").on( "change",loadReasonCodes);
+
+    function ValidateForm(formData){
+
+        var is_edit='<?php echo $is_edit?>';
+
+        var flag=true;
+        hideErrors();
+
+        if (formData.form_id =="" ) {
+            flag=false;
+            showError('form_name')
+        }
+
+        if ( formData.form_field =="") {
+            flag=false;
+            showError('field_name')
+        }
+
+        if ( formData.service_type =="") {
+            flag=false;
+            showError('service_type')
+        }
+
+        if ( formData.reason_code =="") {
+            flag=false;
+            showSelect2Error('reason_code')
+        }
+
+        if ( formData.message_id =="") {
+            flag=false;
+            showSelect2Error('templates')
+        }
+
+        return flag;
+
+    }
+
+    function showError(id)
+    {
+        $('#' + id + '_error').css('display','block');
+        $('#' + id).css('border', 'solid 1px red');
+    }
+
+    function showSelect2Error(id)
+    {
+        $('#' + id + '_error').css('display','block');
+        $('#select2-' + id + '-container').parent().css('border', 'solid 1px red');
+    }
+
+    function hideErrors()
+    {
+        $('select').css('border', '1px solid #ced4da');
+        $('.select2-selection').css('border', '1px solid #ced4da');
+        $('[id$="_error"]').css('display','none');
+        $('#alredy-exists').hide();
+        $('#general-error').hide();
+        $('#success-msg').hide();
+    }
+
+    function sendToServer(formData) {
+
+        var url= '<?php echo $this->basePath()?>/templates-management';
+        var action="saveAssignTemplate";
+        var is_edit='<?php echo $is_edit?>';
+        var success_redirect=url+'/assign-template?success_msg=1';
+        $.ajax({
+            url: url+"/"+action,
+            data: {
+                data:formData,
+                is_edit:is_edit,
+                old_data:old_data
+            },
+            error: function(data) {
+               if (data.status = 409) {
+                   $('#alredy-exists').show();
+               } else {
+                   $('#general-error').show();
+               }
+            },
+            dataType: 'json',
+            success: function(data) {
+
+                console.log(data);
+                top.restoreSession();
+                window.location=success_redirect;
+
+            },
+            type: 'POST'
+        });
+    }
+
+    function deleteInServer(formData) {
+
+        var url= '<?php echo $this->basePath()?>/templates-management';
+        var action="delete-assign-template";
+        var success_redirect=url+'/assign-template?success_msg=1';
+
+        $.ajax({
+            url: url+"/"+action,
+            data: {
+                data:formData,
+            },
+            error: function(data) {
+                $('#general-error').show();
+            },
+            dataType: 'json',
+            success: function(data) {
+
+                top.restoreSession();
+                window.location=success_redirect;
+
+            },
+            type: 'POST'
+        });
+    }
+
+    function saveRecord(e,is_edit) {
+
+        e.preventDefault();
+        var collectedData = collectData();
+        var valid = ValidateForm(collectedData);
+
+        if(valid) {
+            sendToServer(collectedData);
+        }
+
+    }
+
+    function deleteRecord(e,is_edit) {
+        if (is_edit) {
+            e.preventDefault();
+            var collectedData = collectData();
+            var valid = ValidateForm(collectedData);
+
+            if(valid) {
+                deleteInServer(collectedData);
+            }
+        }
+    }
+
+    function collectData() {
+        return {
+            form_id :$("#form_name").val().trim(),
+            form_field :$("#field_name").val(),
+            service_type:$("#service_type").val(),
+            reason_code:$("#reason_code").val(),
+            message_id:$("#templates").val(),
+            seq:$("#seq").val(),
+            active : $('#active input:radio:checked').val()
+        }
+    }
+
+    function renderOptions(mySelect,myOptions){
+
+        var selected=mySelect.find(":selected").val();
+
+        mySelect.empty();
+        mySelect.append(
+            $('<option></option>').val("").html("<?php echo xlt('Choose')?>").prop('selected',true)
+        );
+
+        $.each(myOptions, function(val, text) {
+            mySelect.append(
+                $('<option></option>').val(val).html(text)
+            );
+        });
+
+        mySelect.val(selected);
+    }
+
+
+
+    function disableValidaionWarning(id){
+
+        $('#error_'+id).css('display','none');
+
+    }
+
+    /*
+    removes red validation border
+    parent - to toggle the element itself to which the id belongs or its parent.
+     */
+    function removeRedBorder(id, parent){
+        if(parent!==undefined && parent!==null ){
+            $('#select2-' + id + '-container').parent().css('border', '1px solid #aaa');
+        }
+        else{
+            $('#' + id).css('border', '1px solid #aaa');
+        }
+
+    }
+
+    function removeBOM($data) {
+        if (0 === strpos(bin2hex($data), 'efbbbf')) {
+            return substr($data, 3);
+        }
+        return $data;
+    }
+
+    $( document ).ready(function() {
+
+        $("#tab_title").html('<?php echo $title ?>');
+
+
+        $("#go_back").on( "click",function(e) {goBack(e)});
+        $("#save").on( "click",function(e) {saveRecord(e,is_edit)});
+        $("#delete").on( "click",function(e) {deleteRecord(e,is_edit)});
+
+
+    });
+    $("#tab_title").html(<?php echo js_escape($title) ?>);
+</script>
+
+

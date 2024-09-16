@@ -18,6 +18,7 @@
  */
 
 use ClinikalAPI\Controller\ManagerApi;
+use ClinikalAPI\Controller\FormTemplatesManagementController;
 use Interop\Container\ContainerInterface;
 
 return array(
@@ -28,6 +29,9 @@ return array(
         'factories' => [
             ManagerApi::class => function (ContainerInterface $container) {
                 return new ManagerApi($container);
+            },
+            FormTemplatesManagementController::class => function (ContainerInterface $container) {
+                return new FormTemplatesManagementController($container);
             },
         ],
 
@@ -53,6 +57,19 @@ return array(
                     ),
                 ),
             ),
+            'templetes_management' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/templates-management[/:action]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                    ),
+                    'defaults' => array(
+                        'controller' => FormTemplatesManagementController::class,
+                        'action' => 'templatesManagementIndex',
+                    ),
+                ),
+            ),
         ),
     ),
 
@@ -61,5 +78,9 @@ return array(
         'template_path_stack' => array(
             'ClinikalAPI' => __DIR__ . '/../view',
         ),
+        'template_map' => array(
+            'clinikalApi/layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
+        )
     ),
+
 );

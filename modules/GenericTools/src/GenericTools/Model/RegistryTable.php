@@ -3,6 +3,7 @@
 
 namespace GenericTools\Model;
 
+use Laminas\Db\Sql\Where;
 use Laminas\Db\TableGateway\TableGateway;
 use GenericTools\Model\UtilsTraits\JoinBuilder;
 use Laminas\Db\Sql\Expression;
@@ -42,6 +43,20 @@ class RegistryTable
         $this->addGroupForJoin('registry.directory');
 
         return $this->getJoins();
+    }
+
+    public function getFormsKeyDirectoryValueName($equalConditions)
+    {
+        $where = new Where();
+        foreach ($equalConditions as $column => $value) {
+            $where->equalTo($column, $value);
+        }
+        $rs= $this->tableGateway->select($where);
+        $rsArray=array();
+        foreach($rs as $r) {
+            $rsArray[$r->directory]=$r->name;
+        }
+        return $rsArray;
     }
 
 }

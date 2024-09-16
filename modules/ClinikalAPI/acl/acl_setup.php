@@ -15,6 +15,7 @@ AclExtended::addObjectAcl('client_app', 'Client Application', 'SuperUser','Super
 AclExtended::addObjectAcl('client_app', 'Client Application', 'SearchPatient','Search Patient');
 AclExtended::addObjectAcl('client_app', 'Client Application', 'Calendar','Calendar');
 AclExtended::addObjectAcl('client_app', 'Client Application', 'AppointmentDetails','Appointment Details');
+AclExtended::addObjectAcl('client_app', 'Client Application', 'ManageTemplates','Manage Templates');
 
 AclExtended::addObjectSectionAcl('clinikal_api', 'Clinikal API');
 AclExtended::addObjectAcl('clinikal_api', 'Clinikal API', 'general_settings','General settings');

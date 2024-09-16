@@ -255,7 +255,7 @@ class PdfService
         $showDate=($showDate===true) ? 'true' : $showDate;
         switch ($showDate) {
             case "datetime":
-                $showDate= oeFormatDateTime(date("Y-m-d H:m"),false, false);
+                $showDate= oeFormatDateTime(date("Y-m-d H:i"),false, false);
                 break;
             case false :
                 $showDate= false;

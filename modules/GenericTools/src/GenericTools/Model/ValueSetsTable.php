@@ -22,7 +22,60 @@ class ValueSetsTable
         $params= array();
         $params[]=$id;
 
-        $sql=
+        $type = $this->getValueSetType($id);
+        if ($type !== 'Codes') {
+            $sql = "SELECT
+                    fvs.id AS vs_id,
+                    fvs.title AS vs_title,
+                    fvs.status AS vs_status,
+                    fvs.language AS vs_lang,
+                    fvss.system AS system,
+                    lo.option_id AS code,
+                    lo.title AS display
+                FROM
+                    fhir_value_sets AS fvs
+                        JOIN
+                    fhir_value_set_systems AS fvss ON fvs.id = fvss.vs_id
+                        LEFT JOIN
+                    fhir_value_set_codes AS fvsc ON fvss.id = fvsc.vss_id
+                        JOIN list_options AS lo ON fvss.system = lo.list_id
+                        AND ((fvss.type = 'All'
+                        )
+                        OR (fvss.type = 'Partial'
+                        AND fvsc.code = lo.option_id
+                        )
+                        OR (fvss.type = 'Exclude'
+                        AND fvsc.code != lo.option_id
+                        )
+                        OR (fvss.type = 'Filter'
+                        AND fvss.filter = lo.notes
+                        )
+                        OR (fvss.type = 'Codes')
+                        )
+                WHERE
+                    fvs.id = ? ";
+        } else {
+            $sql = "SELECT
+                    fvs.id AS vs_id,
+                    fvs.title AS vs_title,
+                    fvs.status AS vs_status,
+                    fvs.language AS vs_lang,
+                    fvss.system AS system,
+                    co.code AS code,
+                    co.code_text AS display
+                FROM
+                    fhir_value_sets AS fvs
+                        JOIN
+                    fhir_value_set_systems AS fvss ON fvs.id = fvss.vs_id
+                        LEFT JOIN
+                    fhir_value_set_codes AS fvsc ON fvss.id = fvsc.vss_id
+                        JOIN codes AS co ON fvss.system = co.code_type
+                WHERE
+                    fvs.id = ? ";
+        }
+
+        // put original sql in comment - cause very serious performance problems
+       /* $sql=
             "
             SELECT fvs.id as vs_id, fvs.title as vs_title, fvs.status as vs_status, fvss.system as system, lo.a_option_id as code, lo.a_title as display
             FROM {$this->tableGateway->table} AS fvs
@@ -52,7 +105,7 @@ class ValueSetsTable
 
                 )
                 ";
-        $sql .= " WHERE fvs.id = ? ";
+        $sql .= " WHERE fvs.id = ? ";*/
 
         foreach($where as $index => $conditionSet){
 
@@ -70,13 +123,20 @@ class ValueSetsTable
 
                         $params[]=$condition['value'];
                         $params[]=$condition['value'];
-                        $sql .= "AND ( lo.a_option_id " . $action . " OR lo.a_title " . $action . " ) ";
+                        if ($type !== 'Codes') {
+                            $sql .= "AND ( lo.option_id " . $action . " OR lo.title " . $action . " ) ";
+                        } else {
+                            $sql .= "AND ( co.code " . $action . " OR co.code_text " . $action . " ) ";
+                        }
                     }
                 }
             }
         }
-
-        $sql .= " ORDER BY lo.a_list_id, lo.a_seq ";
+        if ($type !== 'Codes') {
+            $sql .= " ORDER BY lo.list_id, lo.seq ";
+        } else {
+            $sql .= " ORDER BY co.code_type , co.code ";
+        }
 
         $statement = $this->tableGateway->adapter->createStatement($sql, $params);
         $return = $statement->execute();
@@ -111,5 +171,36 @@ class ValueSetsTable
             return null;
         }
      }
+
+    public function getValueSetType($valueSetId)
+    {
+        $params= array();
+        $params[]=$valueSetId;
+
+        $sql  = "SELECT type FROM  fhir_value_set_systems WHERE vs_id = ?";
+
+        $statement = $this->tableGateway->adapter->createStatement($sql, $params);
+        $return = $statement->execute();
+
+        $results = array();
+        foreach ($return as $row) {
+            $results[] = $row;
+        }
+        if (!empty($results)){
+            return $results[0]['type'];
+        }else{
+            return null;
+        }
+    }
+
+    public function getValueSetInfo($valueSetId)
+    {
+        $rsArray=array();
+        $rs =$this->tableGateway->select(['id' => $valueSetId]);
+        foreach($rs as $r) {
+            $rsArray[]=get_object_vars($r);
+        }
+        return $rsArray;
+    }
 
 }

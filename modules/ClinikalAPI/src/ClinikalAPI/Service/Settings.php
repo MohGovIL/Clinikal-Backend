@@ -58,8 +58,15 @@ class Settings
                     "clinikal_pa_arrival_way" =>$GLOBALS['clinikal_pa_arrival_way'],
                     "clinikal_pa_next_enc_status" =>$GLOBALS['clinikal_pa_next_enc_status'],
                 ),
+                "forms" => array(
                 )
+            )
         );
+        foreach ($GLOBALS as $key => $value) {
+            if (substr( $key, 0, 14 ) === "clinikal_forms") {
+                $settings['clinikal']['forms'][$key] = $value;
+            }
+        }
 
         return RestControllerHelper::responseHandler($settings, null, 200);
     }

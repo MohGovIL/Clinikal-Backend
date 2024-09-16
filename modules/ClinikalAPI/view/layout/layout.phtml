@@ -1,0 +1,60 @@
+<?php
+use GenericTools\Library\UiComponents\ValidateJS\ValidateJsFunctions;
+use OpenEMR\Core\Header;
+?>
+<!-- Layout -->
+<html>
+    <head>
+        <title id="tab_title"></title>
+        <?php Header::setupHeader(['jquery','bootstrap','datetime-picker','main-theme', 'fontawesome','select2']); ?>
+        <?php    $use_validate_js = 1;?>
+        <?php  require_once($GLOBALS['srcdir'] . "/validation/validation_script.js.php"); ?>
+
+        <script>
+            var constraints = JSON.parse(<?php echo json_encode($validateJs)?>);
+            <?php echo ValidateJsFunctions::append(); ?>
+        </script>
+        <style>
+
+            .dataTables_filter input{
+                background-color: ghostwhite;
+            }
+            #print{
+                margin-top: 10px;
+                margin-bottom: 15px;
+            }
+
+            .row_padded{
+                padding-top: 5px;
+
+            }
+
+            .btn-no-padding{
+                padding-top: 0px;
+                padding-bottom: 0px;
+            }
+
+            .form-inline .form-group-TWB >.long-label{
+                width: 130px !important;
+            }
+
+            nav .center-buttons{
+                padding: 10px;
+                margin-right: 5px;
+            }
+
+
+        </style>
+
+    </head>
+    <body class="body_top">
+        <div class="container-fluid">
+            <div class='row'>
+                <div id="logistic-management-wrapper" class="col-md-12">
+                    <?php echo $this->content; ?>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+

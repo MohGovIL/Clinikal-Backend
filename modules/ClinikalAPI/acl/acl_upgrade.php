@@ -18,5 +18,8 @@ return $ACL_UPGRADE = array(
         AclExtended::addObjectSectionAcl('clinikal_api', 'Clinikal API');
         AclExtended::addObjectAcl('clinikal_api', 'Clinikal API', 'general_settings','General settings');
         AclExtended::addObjectAcl('clinikal_api', 'Clinikal API', 'lists','Lists');
+    },
+    '2.0.0' => function() {
+        AclExtended::addObjectAcl('client_app', 'Client Application', 'ManageTemplates','Manage Templates');
     }
 );

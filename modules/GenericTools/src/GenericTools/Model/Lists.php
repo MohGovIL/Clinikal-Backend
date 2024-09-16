@@ -20,7 +20,7 @@ class Lists
         $this->option_id = (!empty($data['option_id'])) ? $data['option_id'] : null;
         $this->title = (!empty($data['title'])) ? $data['title'] : null;
         $this->activity = (!empty($data['activity'])) ? $data['activity'] : null;
-        $this->subtype = (!empty($data['subtype'])) ? $data['subtype'] : null;
+        $this->subtype = (!empty($data['subtype'])) ? $data['subtype'] : '';
         $this->notes = (!empty($data['notes'])) ? $data['notes'] : null;
 
     }

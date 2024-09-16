@@ -12,7 +12,7 @@
         height: 18px;
         opacity: 0.6;
         font-family: OpenSansHebrew;
-        font-size: 10px;
+        font-size: 13px;
         font-weight: normal;
         font-stretch: normal;
         font-style: normal;
@@ -25,7 +25,7 @@
         width: 104px;
         height: 18px;
         font-family: OpenSansHebrew;
-        font-size: 12px;
+        font-size: 15px;
         font-weight: normal;
         font-stretch: normal;
         font-style: normal;
@@ -34,6 +34,7 @@
         text-align: right;
         color: #000b40;
     }
+
 </style>
     <table class="Rectangle" dir="<?php echo text($langDir); ?>"  lang="<?php echo text($langCode); ?>">
         <tbody>
@@ -69,8 +70,8 @@
                 <p class="Input-text"><?php echo($HMO);?></p>
             </td>
             <td>
-                <p class="Label-Text"></p>
-                <p class="Input-text"></p>
+                <p class="Label-Text"><?php echo(xlt("Address"));?></p>
+                <p class="Input-text"><?php echo text($address);?></p>
             </td>
         </tr>
         </tbody>

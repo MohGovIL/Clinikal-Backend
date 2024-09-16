@@ -40,7 +40,15 @@ trait IndicatorSettingsService
                     if($val['notes']!=='') {
                         $notes = json_decode($val['notes']);
                         $arrTemp['label'] =  $notes->label;
-                        $arrTemp['mask'] = $notes->mask;
+                        if (isset($notes->mask)) {
+                            $arrTemp['mask'] = $notes->mask;
+                        }
+                        if (isset($notes->placeholder)) {
+                            $arrTemp['placeholder'] = $notes->placeholder;
+                        }
+                        if (isset($notes->symbol)) {
+                            $arrTemp['symbol'] = $notes->symbol;
+                        }
                         $indicators['variant'][$key]=$arrTemp;
                     }else{
                         $arrTemp['label'] = $val['mapping'];
@@ -56,7 +64,15 @@ trait IndicatorSettingsService
                 if($val['notes']!=='') {
                     $notes = json_decode($val['notes']);
                     $arrTemp['label'] =  $notes->label;
-                    $arrTemp['mask'] = $notes->mask;
+                    if (isset($notes->mask)) {
+                        $arrTemp['mask'] = $notes->mask;
+                    }
+                    if (isset($notes->placeholder)) {
+                        $arrTemp['placeholder'] = $notes->placeholder;
+                    }
+                    if (isset($notes->symbol)) {
+                        $arrTemp['symbol'] = $notes->symbol;
+                    }
                     $indicators['constant'][$key]=$arrTemp;
                 }else{
                     $arrTemp['label'] = $val['mapping'];

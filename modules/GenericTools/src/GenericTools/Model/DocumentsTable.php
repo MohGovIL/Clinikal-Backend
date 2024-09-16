@@ -5,7 +5,6 @@ namespace GenericTools\Model;
 
 use GenericTools\Model\UtilsTraits\JoinBuilder;
 use Laminas\Db\Sql\Select;
-use Laminas\Db\Sql\Sql;
 use Laminas\Db\TableGateway\TableGateway;
 use Laminas\Db\Sql\Expression;
 
